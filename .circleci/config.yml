@@ -15,7 +15,6 @@ commands:
             aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
             echo "done cleanup"
-            exit 1
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -291,7 +290,7 @@ jobs:
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["95:18:ab:26:de:ef:25:cc:8b:62:f3:08:c2:01:33:b1"]
+          fingerprints: ["b0:98:a8:20:fc:d7:fa:6a:0e:b4:21:4a:8f:62:e5:11"]
       # attach workspace
       - attach_workspace:
           at: .
@@ -372,8 +371,6 @@ jobs:
           when: on_fail
       - revert-migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
-      - destroy-environment:
           when: on_fail
 
 
