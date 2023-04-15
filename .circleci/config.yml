@@ -117,6 +117,7 @@ jobs:
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \
               --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -125,6 +126,7 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \
               --tags project=udapeople
+
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -133,6 +135,7 @@ jobs:
               --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text >> .circleci/ansible/inventory
             cat .circleci/ansible/inventory
+
       - persist_to_workspace:
           root: .
           paths:
@@ -194,7 +197,9 @@ jobs:
           command: |
             cd backend
             npm install
-            npm run migrations > migrations_dump.txt
+            touch temp
+            npm run migrations > temp
+            cat temp
       - run:
           name: Send migration results to memstash
           command: |
@@ -202,6 +207,8 @@ jobs:
             then
               curl https://kvdb.io/EdACAy79Bqi6mn4YXVEKJ1/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
+      - destroy-environment:
+          when: on_fail
   deploy-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -221,7 +228,7 @@ jobs:
           name: Get backend url
           command: |
             cd frontend
-            export BACKEND_IP = $(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople")
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
