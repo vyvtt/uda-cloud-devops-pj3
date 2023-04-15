@@ -133,6 +133,46 @@ jobs:
               --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text >> .circleci/ansible/inventory
             cat .circleci/ansible/inventory
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .circleci/ansible/inventory
+
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          when: on_fail
+
+  configure-infrastructure:
+    docker:
+      - image: python:3.9.0-alpine
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["b0:98:a8:20:fc:d7:fa:6a:0e:b4:21:4a:8f:62:e5:11"]
+      # attach workspace
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install required dependencies
+          command: |
+            apk add tar unzip curl
+            apk add --no-cache aws-cli
+            aws --version
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            ansible --version
+      - run:
+          name: Configure server
+          command: |
+            cd ./.circleci/ansible/
+            ansible-playbook -i inventory configure-server.yml
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          when: on_fail
       - destroy-environment:
           when: on_fail
 
@@ -155,3 +195,5 @@ workflows:
           filters:
             branches:
               only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
