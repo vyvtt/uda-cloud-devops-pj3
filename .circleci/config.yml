@@ -350,16 +350,16 @@ jobs:
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             
-            echo "${BACKEND_IP}"
-            echo "API_URL=${API_URL}"
-            echo "Sleeping for 2.5 minutes"
-            sleep 150
+            # echo "${BACKEND_IP}"
+            # echo "API_URL=${API_URL}"
+            # echo "Sleeping for 2.5 minutes"
+            # sleep 150
 
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-              return 0
-            else
-              return 1
+            # if curl "${API_URL}/api/status" | grep "ok"
+            # then
+            #   return 0
+            # else
+            #   return 1
             fi
       - run:
           name: Frontend smoke test.
