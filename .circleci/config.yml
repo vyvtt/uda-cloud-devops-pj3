@@ -408,14 +408,12 @@ jobs:
           name: Install dependencies
           command: |
             yum -y install tar gzip awscli curl npm nodejs
-      - attach_workspace:
-          at: .
       - run:
           name: stash current workflow id
           command: |
             curl -k -d ${CIRCLE_WORKFLOW_ID:0:7} https://kvdb.io/WXvu7CYLMyQtWtBEvGwHQ2/migration
       - run:
-          name: Update cloudfront distribution
+          name: Store current workflow id as OldWorkflowID.txt
           command: |
             export OldWorkflowID=$(aws cloudformation list-exports \
               --query "Exports[?Name=='WorkflowID'].Value" --no-paginate --output text)
@@ -425,9 +423,17 @@ jobs:
             echo "Current stacks: ${STACKS[@]}"
             echo ${OldWorkflowID} >> ~/OldWorkflowID.txt
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - ./OldWorkflowID.txt
+            - OldWorkflowID.txt
+      - run:
+          name: Change Cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/cloudfront.yml \
+              --stack-name InitialStack \
+              --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           when: on_fail
@@ -446,7 +452,7 @@ jobs:
           command: |
             yum install -y tar gzip unzip
       - attach_workspace:
-          at: .
+          at: ~/
       - run:
           name: Remove old stacks and files
           command: |
