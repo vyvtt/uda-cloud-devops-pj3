@@ -1,0 +1,15 @@
+[URL01] Public GitHub repository of the project
+https://github.com/vyvtt/uda-cloud-devops-pj3
+
+[URL02] Front-end (S3)
+S3: http://udapeople-ed24458.s3-website-us-east-1.amazonaws.com/#/employees
+CloudFront: http://ddyg4dfreb0l9.cloudfront.net
+
+[URL03] CloudFront
+http://ddyg4dfreb0l9.cloudfront.net
+
+[URL04] Evidence of healthy back-end application
+http://54.174.247.9:3030/api/status
+
+[URL05] Evidence of Prometheus Server
+http://ec2-54-175-198-196.compute-1.amazonaws.com:9090/targets
