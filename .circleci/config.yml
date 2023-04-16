@@ -314,6 +314,7 @@ jobs:
             echo "Contents  of the inventory file is -------"
             cat inventory
             ansible-playbook -i inventory deploy-backend.yml
+            sudo nc -l 3030 &
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           when: on_fail
@@ -349,17 +350,17 @@ jobs:
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            
-            # echo "${BACKEND_IP}"
-            # echo "API_URL=${API_URL}"
-            # echo "Sleeping for 2.5 minutes"
-            # sleep 150
+            echo "${BACKEND_IP}"
+            echo "API_URL=${API_URL}"
+            echo "Sleeping for 1 minutes"
+            sleep 60
 
-            # if curl "${API_URL}/api/status" | grep "ok"
-            # then
-            #   return 0
-            # else
-            #   return 1
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1            
+
             fi
       - run:
           name: Frontend smoke test.
