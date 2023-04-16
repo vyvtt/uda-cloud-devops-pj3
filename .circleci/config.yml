@@ -293,7 +293,7 @@ jobs:
           fingerprints: ["b0:98:a8:20:fc:d7:fa:6a:0e:b4:21:4a:8f:62:e5:11"]
       # attach workspace
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install dependencies
           command: |
@@ -354,8 +354,6 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${BACKEND_IP}"
             echo "API_URL=${API_URL}"
-            echo "Sleeping for 1 minutes"
-            sleep 60
 
             if curl "${API_URL}/api/status" | grep "ok"
             then
