@@ -1,22 +1,39 @@
-- name: create directory 
-  become: true
-  file: 
-    path: /home/ubuntu/web
-    state: directory
-    mode: 0755
-- name: copy artifact
-  become: true
-  copy: 
-    src: ~/project/artifact.tar.gz
-    dest: /home/ubuntu/web/artifact.tar.gz
-- name: Extract artifact files
-  become: true
-  shell: |
-    cd /home/ubuntu/web
-    tar -xvf artifact.tar.gz
-- name: Executing node
-  become: true
-  shell: |
-    cd /home/ubuntu/web
-    pm2 stop default
-    pm2 start npm -- start
+---
+  - name: "print environment"
+    shell: env
+
+  - name: "copy backend dist"
+    become: yes
+    synchronize:
+      src: ../../backend/dist
+      dest: /home/ubuntu/uda_app
+      recursive: true
+
+  - name: "copy node_modules"
+    become: yes
+    synchronize:
+      src: ../../backend/node_modules
+      dest: /home/ubuntu/uda_app
+      recursive: true
+
+  - name: "pm2 delete all"
+    become: true
+    command: pm2 delete all
+    ignore_errors: true
+
+  - name: "pm2 start -f ./main.js"
+    become: true
+    command: pm2 start -f ./main.js
+    args:
+      chdir: /home/ubuntu/uda_app/dist
+    environment:
+     ENVIRONMENT: production
+     TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
+     TYPEORM_MIGRATIONS_DIR: "./migrations"
+     TYPEORM_MIGRATIONS: "./migrations/*.js"
+     TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+     TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+     TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+     TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+     TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+     TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
