@@ -2,13 +2,13 @@
 https://github.com/vyvtt/uda-cloud-devops-pj3
 
 [URL02] Front-end (S3)
-http://udapeople-524987e.s3-website-us-east-1.amazonaws.com/#/employees
+http://udapeople-8424ad4.s3-website-us-east-1.amazonaws.com/#/employees
 
 [URL03] CloudFront
-http://ddyg4dfreb0l9.cloudfront.net
+http://d2b5zz3b4jrmz3.cloudfront.net/#/employees
 
 [URL04] Evidence of healthy back-end application
-http://52.91.62.233:3030/api/status
+http://52.91.113.244:3030/api/status
 
 [URL05] Evidence of Prometheus Server
-http://ec2-54-175-198-196.compute-1.amazonaws.com:9090/targets
+http://ec2-34-230-77-184.compute-1.amazonaws.com:9090/targets
